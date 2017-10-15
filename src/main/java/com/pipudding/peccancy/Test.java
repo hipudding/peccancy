@@ -1,4 +1,4 @@
-package com.pipudding.peccancy.controller;
+package com.pipudding.peccancy;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

@@ -1,0 +1,18 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://www.hipudding.cn:3306/peccancy?characterEncoding=utf8&useSSL=false
+    username: root
+    password: test@1234
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    database : MYSQL
+    properties:  
+      hibernate:  
+        dialect : org.hibernate.dialect.MySQL5Dialect
