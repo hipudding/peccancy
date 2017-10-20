@@ -14,10 +14,24 @@ public class WeixinController {
 	WeixinService weixinService;
 	
 	@RequestMapping("/postevent")  
-    public String postevent(Model model) {  
+    public String postEvent() {  
 		weixinService.clearLastNotCommitImages("hua");
         return "event_info";  
     }
 	
+	@RequestMapping("/recordinfo")  
+    public String recordInfo() {  
+        return "personal_info";  
+    }
+	
+	@RequestMapping("/eventlist")  
+    public String eventList() {  
+        return "event_list";  
+    }
+	
+	@RequestMapping("/eventshow")  
+    public String eventShow() {  
+        return "event_show";  
+    }
 	
 }

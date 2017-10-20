@@ -4,9 +4,11 @@
 <meta charset="UTF-8"></meta>
 <meta name="viewport"
 	content="width=device-width,initial-scale=1,user-scalable=0"></meta>
-<title>实名信息</title>
+<title>举报提交</title>
 <link rel="stylesheet"
 	href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css"></link>
+<link rel="stylesheet"
+	href="css/style.css"></link>
 <script type="text/javascript"
 	src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
 <script type="text/javascript" src="js/zepto.min.js"></script>
@@ -63,14 +65,24 @@ label>* {
 		style="display: none;">错误提示</div>
 	<div class="container" id="container">
 		<div class="page input js_show">
+			<div class="page__hd">
+				<h1 class="page__title">举报提交</h1>
+				<p class="page__desc">请填写举报内容</p>
+			</div>
 			<div class="page__bd">
-				<div class="weui-cells__title">文本框</div>
+			<div class="weui-cells__title">类别选择</div>
+				<div class="page__bd page__bd_spacing">
+					<a href="javascript:;" class="weui-btn weui-btn_default"
+						id="showPicker">类别</a> <a href="javascript:;"
+						class="weui-btn weui-btn_default" id="showPicker">场景</a>
+				</div>
+				<div class="weui-cells__title">上传图片</div>
 				<div class="weui-cells weui-cells_form" id="uploader">
 					<div class="weui-cell">
 						<div class="weui-cell__bd">
 							<div class="weui-uploader">
 								<div class="weui-uploader__hd">
-									<p class="weui-uploader__title">图片上传</p>
+									<p class="weui-uploader__title"></p>
 									<div class="weui-uploader__info">
 										<span id="uploadCount">0</span>/5
 									</div>
@@ -86,9 +98,20 @@ label>* {
 						</div>
 					</div>
 				</div>
+				<div class="weui-cells__title">描述</div>
+				<div class="weui-cells weui-cells_form">
+					<div class="weui-cell">
+						<div class="weui-cell__bd">
+							<textarea class="weui-textarea" placeholder="请输入文本" rows="3"></textarea>
+							<div class="weui-textarea-counter">
+								<span>0</span>/200
+							</div>
+						</div>
+					</div>
+				</div>
 				<div class="weui-btn-area">
 					<a id="uploaderCustomBtn" href="javascript:"
-						class="weui-btn weui-btn_primary">上传</a>
+						class="weui-btn weui-btn_primary">提交</a>
 				</div>
 			</div>
 		</div>
