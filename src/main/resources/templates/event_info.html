@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+<head>
+<meta charset="UTF-8"></meta>
+<meta name="viewport"
+	content="width=device-width,initial-scale=1,user-scalable=0"></meta>
+<title>实名信息</title>
+<link rel="stylesheet"
+	href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css"></link>
+<script type="text/javascript"
+	src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
+<script type="text/javascript" src="js/zepto.min.js"></script>
+<script type="text/javascript"
+	src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+
+
+<style>
+body, html {
+	height: 100%;
+	background-color: #f8f8f8
+}
+
+body {
+	font-family: -apple-system-font, Helvetica Neue, Helvetica, sans-serif
+}
+
+.item {
+	padding: 10px 0
+}
+
+.item__title {
+	margin-bottom: 5px;
+	padding-left: 15px;
+	padding-right: 15px;
+	color: #999;
+	font-weight: 400;
+	font-size: 14px
+}
+
+.item__ctn {
+	padding: 0 15px
+}
+
+.page_feedback {
+	padding: 15px;
+	overflow: auto;
+	background-color: #FFF
+}
+
+label>* {
+	pointer-events: none
+}
+
+.weui-picker__item {
+	padding: 0;
+	height: 34px;
+	line-height: 34px
+}
+</style>
+</head>
+<body>
+	<div class="weui-toptips weui-toptips_warn js_tooltips"
+		style="display: none;">错误提示</div>
+	<div class="container" id="container">
+		<div class="page input js_show">
+			<div class="page__bd">
+				<div class="weui-cells__title">文本框</div>
+				<div class="weui-cells weui-cells_form" id="uploader">
+					<div class="weui-cell">
+						<div class="weui-cell__bd">
+							<div class="weui-uploader">
+								<div class="weui-uploader__hd">
+									<p class="weui-uploader__title">图片上传</p>
+									<div class="weui-uploader__info">
+										<span id="uploadCount">0</span>/5
+									</div>
+								</div>
+								<div class="weui-uploader__bd">
+									<ul class="weui-uploader__files" id="uploaderFiles"></ul>
+									<div class="weui-uploader__input-box">
+										<input id="uploaderInput" class="weui-uploader__input"
+											type="file" name="file" accept="image/*" multiple="" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="weui-btn-area">
+					<a id="uploaderCustomBtn" href="javascript:"
+						class="weui-btn weui-btn_primary">上传</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript" class="input js_show">
+		$(function() {
+			
+			/* 图片自动上传 */
+			var uploadCount = 0, uploadList = [];
+			var uploadCountDom = document.getElementById("uploadCount");
+			weui.uploader('#uploader', {
+			    url: '/imgupload',
+			    auto: true,
+			    type: 'file',
+			    fileVal: 'fileVal',
+			    compress: {
+			        width: 1600,
+			        height: 1600,
+			        quality: .8
+			    },
+			    onBeforeQueued: function(files) {
+			        if(["image/jpg", "image/jpeg", "image/png", "image/gif"].indexOf(this.type) < 0){
+			            weui.alert('请上传图片');
+			            return false;
+			        }
+			        if(this.size > 10 * 1024 * 1024){
+			            weui.alert('请上传不超过10M的图片');
+			            return false;
+			        }
+			        if (files.length > 5) { // 防止一下子选中过多文件
+			            weui.alert('最多只能上传5张图片，请重新选择');
+			            return false;
+			        }
+			        if (uploadCount + 1 > 5) {
+			            weui.alert('最多只能上传5张图片');
+			            return false;
+			        }
+
+			        ++uploadCount;
+			        uploadCountDom.innerHTML = uploadCount;
+			    },
+			    onQueued: function(){
+			        uploadList.push(this);
+			        console.log(this);
+			    },
+			    onBeforeSend: function(data, headers){
+			        console.log(this, data, headers);
+			        // $.extend(data, { test: 1 }); // 可以扩展此对象来控制上传参数
+			        // $.extend(headers, { Origin: 'http://127.0.0.1' }); // 可以扩展此对象来控制上传头部
+
+			        // return false; // 阻止文件上传
+			    },
+			    onProgress: function(procent){
+			        console.log(this, procent);
+			    },
+			    onSuccess: function (ret) {
+			        console.log(this, ret);
+			        var uploadID = this.id;
+					$("#uploaderFiles li").each(function(){
+	                    if ($(this).attr("data-id") == uploadID)
+	                    {
+	                        $(this).attr("data-fid", ret.resultText);
+	                    }
+	                });
+			    },
+			    onError: function(err){
+			        console.log(this, err);
+			    }
+			});
+
+			// 缩略图预览
+			document.querySelector('#uploaderFiles').addEventListener('click', function(e){
+			    var target = e.target;
+
+			    while(!target.classList.contains('weui-uploader__file') && target){
+			        target = target.parentNode;
+			    }
+			    if(!target) return;
+
+			    var url = target.getAttribute('style') || '';
+			    var id = target.getAttribute('data-id');
+
+			    if(url){
+			        url = url.match(/url\((.*?)\)/)[1].replace(/"/g, '');
+			    }
+			    var gallery = weui.gallery(url, {
+			        className: 'custom-name',
+			        onDelete: function(){
+			            weui.confirm('确定删除该图片？', function(){
+			                --uploadCount;
+			                uploadCountDom.innerHTML = uploadCount;
+
+
+			                for (var i = 0, len = uploadList.length; i < len; ++i) {
+			                    var file = uploadList[i];
+			                    if(file.id == id){
+			                        file.stop();
+			                        $("#uploaderFiles li").each(function () {
+	                                    if ($(this).attr("data-id") == id) {
+	                                        var fid = $(this).attr("data-fid");
+	                                        $('#loadingToast').fadeIn(100);
+	                                        var param = {};
+	                                        param.flag = new Date().getTime();
+	                                        param.ID = fid;
+	                                        $.post("/imgdelete", param, function (data) {
+	                                            $('#loadingToast').fadeOut(100);
+	                                        });
+	                                    }
+	                                });
+			                        break;
+			                    }
+			                }
+			                target.remove();
+			                gallery.hide();
+			            });
+			        }
+			    });
+			});
+
+			
+			var $tooltips = $('.js_tooltips');
+
+			$('#showTooltips').on('click', function() {
+				if ($tooltips.css('display') != 'none')
+					return;
+
+				// toptips的fixed, 如果有`animation`, `position: fixed`不生效
+				$('.page.cell').removeClass('slideIn');
+
+				$tooltips.css('display', 'block');
+				setTimeout(function() {
+					$tooltips.css('display', 'none');
+				}, 2000);
+			});
+
+		});
+	</script>
+
+</body>
+</html>

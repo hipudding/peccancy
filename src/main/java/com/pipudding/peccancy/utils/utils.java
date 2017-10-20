@@ -1,4 +1,4 @@
-package com.pipudding.peccancy;
+package com.pipudding.peccancy.utils;
 
 import java.io.UnsupportedEncodingException;
 
