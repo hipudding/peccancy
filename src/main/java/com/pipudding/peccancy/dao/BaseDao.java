@@ -25,6 +25,11 @@ public class BaseDao<T> {
 		sessionFactory.getCurrentSession().save(entity);
 	}
 	
+	public void saveOrUpdate(T entity)
+	{
+		sessionFactory.getCurrentSession().saveOrUpdate(entity);
+	}
+	
 	public void update(T entity) {  
 		sessionFactory.getCurrentSession().update(entity);  
     }  

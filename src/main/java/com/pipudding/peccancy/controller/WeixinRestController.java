@@ -3,6 +3,7 @@ package com.pipudding.peccancy.controller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
 
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.pipudding.peccancy.service.WeixinService;
+import com.pipudding.peccancy.utils.CustomerInfoType;
+import com.pipudding.peccancy.utils.EvenInfoType;
+import com.pipudding.peccancy.utils.EventType;
 import com.pipudding.peccancy.utils.ResultType;
 
 @RestController
@@ -30,6 +35,7 @@ public class WeixinRestController {
 	
 	@Autowired
 	WeixinService weixinService;
+
 	
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
@@ -90,6 +96,38 @@ public class WeixinRestController {
 		ret.setResultText("");
 		return ret;
     }
-   
+	
+	@RequestMapping(value = "/postcustomerinfo", method = RequestMethod.POST)
+	public ResultType postCustomerInfo(@RequestBody CustomerInfoType customerInfo) throws IllegalStateException, IOException {
+		ResultType ret = new ResultType();
+		String customerId = "hua";
+		
+		weixinService.saveCustomInfo(customerId, customerInfo);
+		
+		ret.setResultCode("success");
+		ret.setResultText("");
+		return ret;
+    }
+	
+	@RequestMapping(value = "/getcustomerinfo", method = RequestMethod.POST)
+	public CustomerInfoType getCustomerInfo(@RequestParam(value = "customerId") String customerId) throws IllegalStateException, IOException {
+		CustomerInfoType customerInfo = weixinService.getCustomer(customerId);
+		
+		return customerInfo;
+    }
+	
+	@RequestMapping(value = "/gettypes", method = RequestMethod.GET)
+	public EventType[] getTypes() throws IllegalStateException, IOException {
+		
+		List<EventType> eventTypes = weixinService.getEventTypes();
+		EventType[] eventTypeArray = new EventType[eventTypes.size()];
+		eventTypes.toArray(eventTypeArray);
+		return eventTypeArray;
+    }
+	
+	@RequestMapping(value = "/posteventinfo", method = RequestMethod.POST)
+	public void postEventInfo(@RequestBody EvenInfoType eventInfo) throws IllegalStateException, IOException {
+		
+    }
 
 }

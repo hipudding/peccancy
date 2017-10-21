@@ -17,7 +17,7 @@ public class ImageEntity {
 	private String imgId;
 	
 	@Column(name = "user_id")
-	private String userId;
+	private String customerId;
 
 	public String getEventId() {
 		return eventId;
@@ -35,12 +35,12 @@ public class ImageEntity {
 		this.imgId = imgId;
 	}
 
-	public String getUserId() {
-		return userId;
+	public String getCustomerId() {
+		return customerId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
 	}
 	
 	
