@@ -61,29 +61,25 @@ public class WeixinRestController {
 	
 	@RequestMapping(value = "/imgupload", method = RequestMethod.POST)
 	public ResultType imageUpload(@RequestParam(value = "fileVal") MultipartFile file) throws IllegalStateException, IOException {	
-		String resultText = "";
+		ResultType ret = new ResultType();
+		ret.setResultCode("fail");
 		if(file == null)
-			resultText = "file is null";
+		{
+			ret.setResultText("file is null");
+			return ret;
+		}
 		
 		String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
 		String fileName = UUID.randomUUID().toString() + suffix;
 		
 		if(weixinService.saveFile(file, imgPath,fileName) == false)
-			resultText = "save file fail";
-
-		//TODO 参数需要校验
-		ResultType ret = new ResultType();
+		{
+			ret.setResultText("save file fail");
+			return ret;
+		}
 		
-		if(!resultText.equals(""))
-		{
-			ret.setResultCode("fail");
-			ret.setResultText(resultText);
-		}
-		else
-		{
-			ret.setResultCode("success");
-			ret.setResultText(fileName);
-		}
+		ret.setResultCode("success");
+		ret.setResultText(fileName);
 		
 		return ret;
     }
@@ -126,8 +122,23 @@ public class WeixinRestController {
     }
 	
 	@RequestMapping(value = "/posteventinfo", method = RequestMethod.POST)
-	public void postEventInfo(@RequestBody EvenInfoType eventInfo) throws IllegalStateException, IOException {
+	public ResultType postEventInfo(@RequestBody EvenInfoType eventInfo) throws IllegalStateException, IOException {
+		ResultType ret = new ResultType();
+		ret.setResultCode("fail");
+		String customerId = "hua";
+		String eventId = weixinService.createEvent(customerId,eventInfo.getType(),eventInfo.getText());
+		if(eventId == "")
+		{
+			ret.setResultText("create event failed");
+			return ret;
+		}
 		
+		weixinService.setImageEventId(eventInfo.getImages(), eventId);
+			
+		ret.setResultCode("success");
+		ret.setResultText("");
+		return ret;
+			
     }
 
 }

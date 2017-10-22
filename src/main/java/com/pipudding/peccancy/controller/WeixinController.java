@@ -1,12 +1,18 @@
 package com.pipudding.peccancy.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.pipudding.peccancy.service.WeixinService;
 import com.pipudding.peccancy.utils.CustomerInfoType;
+import com.pipudding.peccancy.utils.EventListType;
+import com.pipudding.peccancy.utils.EventShowType;
 
 @Controller
 public class WeixinController {
@@ -38,13 +44,20 @@ public class WeixinController {
         return "personal_info";  
     }
 	
-	@RequestMapping("/eventlist")  
-    public String eventList() {  
+	@RequestMapping("/eventlist") 
+    public String eventList(Model model) {  
+		String customerId = "hua";
+		List<EventListType> events = weixinService.getEventList(customerId);
+		model.addAttribute("eventList",events);
+		
         return "event_list";  
     }
-	
-	@RequestMapping("/eventshow")  
-    public String eventShow() {  
+	@RequestMapping(	value="/eventshow/{eventId}",method=RequestMethod.GET)  
+    public String eventShow(@PathVariable String eventId,Model model) {
+		
+		EventShowType eventShow = weixinService.getEvent(eventId);
+		model.addAttribute("event", eventShow);
+		
         return "event_show";  
     }
 	

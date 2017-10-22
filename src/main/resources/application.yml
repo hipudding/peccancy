@@ -28,6 +28,9 @@ spring:
       max-file-size: 10MB
       max-request-size: 50MB
         
+  resources:
+    static-locations: classpath:/static/,classpath:/templates/,file:${img_path}
+
 token_expire: 7200
 token_url: https://api.weixin.qq.com/cgi-bin/token
 my_token: hipudding

@@ -7,10 +7,10 @@
 <title>事件内容</title>
 <link rel="stylesheet"
 	href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css"></link>
-<link rel="stylesheet" href="css/style.css"></link>
+<link rel="stylesheet" href="/css/style.css"></link>
 <script type="text/javascript"
 	src="https://res.wx.qq.com/open/libs/weuijs/1.1.2/weui.min.js"></script>
-<script type="text/javascript" src="js/zepto.min.js"></script>
+<script type="text/javascript" src="/js/zepto.min.js"></script>
 <script type="text/javascript"
 	src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
 
@@ -81,14 +81,12 @@ label>* {
 			
 				<div class="weui-cells__title">提交内容</div>
 				<div class="weui-cell">
-					<p>这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容</p>
+					<p th:text = "${event.text}"></p>
 				</div>
 				<div class="weui-cells__title">进度展示</div>
 				<div class="peocess_cell">
 				
-				<div class="process"><i class="weui-icon-success"></i>投诉已经受理</div>
-				<div class="process"><i class="weui-icon-success"></i>已经开始调查该违章</div>
-				<div class="process"><i class="weui-icon-waiting"></i>调查结果录入</div>
+				<div class="process" th:each = "flow:${event.flows}"><i th:class="'weui-icon-'+${flow.icon}"></i><a th:text="${flow.flowDesc}"></a></div>
 				</div>
 				
 				<div class="weui-cells__title">图片</div>
@@ -96,10 +94,8 @@ label>* {
 						<div class="weui-cell_bd">
 							<div class="weui-uploader__bd">
 								<ul class="weui-uploader__files" id="uploaderFiles">
-									<li class="weui-uploader__file"
-										style="background-image: url('/pic.jpg');"></li>
-									<li class="weui-uploader__file"
-										style="background-image: url('/pic.jpg');"></li>
+									<li class="weui-uploader__file" th:each = "img:${event.images}"
+										th:style="'background-image: url(/' + ${img} +');'"></li>
 								</ul>
 							</div>
 					</div>
@@ -107,7 +103,7 @@ label>* {
 				
 				<div class="weui-cells__title">处理结果</div>
 				<div class="weui-cell">
-					<p>这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容这里是内容</p>
+					<p th:text = "${event.result}"></p>
 				</div>
 				
 			</div>
