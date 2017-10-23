@@ -32,7 +32,7 @@ import com.pipudding.peccancy.utils.FlowHistoryType;
 
 @Service
 @Transactional
-public class WeixinService {
+public class WeixinService {
 	
 	@Autowired
 	ImageDao imageDao;
@@ -240,6 +240,7 @@ public class WeixinService {
 		EventShowType eventShow = new EventShowType();
 		eventShow.setText(event.getDescription());
 		eventShow.setResult(event.getResult()==null?"":event.getResult());
+		eventShow.setEventNo(event.getEventId());
 		
 		List<String> imagesShow = new ArrayList<String>();
 		for(ImageEntity image:images)
@@ -251,6 +252,11 @@ public class WeixinService {
 		List<FlowHistoryType> flowsShow = new ArrayList<FlowHistoryType>();
 		int flowNo = event.getFlowNo();
 		String flowGroup = event.getFlowGroup();
+		eventShow.setEventFinish(false);
+		eventShow.setShowInputResult(false);
+		if(flowNo == flows.size() - 1)
+			eventShow.setEventFinish(true);
+
 		for(FlowHistoryEntity flow:flows)
 		{
 			hql = "FROM flow WHERE flow_group = ?0 and flow_no = ?1";
@@ -261,9 +267,22 @@ public class WeixinService {
 			FlowHistoryType flowHistory = new FlowHistoryType();
 			flowHistory.setFlowDesc(description);
 			flowHistory.setIcon(flow.getFlow_no() <= flowNo?"success":"waiting");
+			
+			if(flowNo == flowEntities.get(0).getFlowNo()&&flowEntities.get(0).getRecordResult() == 1)
+				eventShow.setShowInputResult(true);
 			flowsShow.add(flowHistory);
 		}
 		eventShow.setFlows(flowsShow);
+		
+		String customerId = event.getCommitor();
+		CustomerEntity customer = customerDao.findById(customerId);
+		
+		CustomerInfoType customerInfo = new CustomerInfoType();
+		customerInfo.setIdentify(customer.getCustomerIdentity());
+		customerInfo.setName(customer.getCustomerName());
+		customerInfo.setTel(customer.getCustomerTel());
+		
+		eventShow.setCustomer(customerInfo);
 		
 		return eventShow;
 	}

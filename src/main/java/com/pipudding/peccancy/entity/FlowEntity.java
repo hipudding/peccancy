@@ -24,6 +24,9 @@ public class FlowEntity {
 	
 	@Column(name = "flow_desc")
 	String flowDesc;
+	
+	@Column(name = "record_result")
+	int recordResult;
 
 	public String getFlowId() {
 		return flowId;
@@ -64,5 +67,14 @@ public class FlowEntity {
 	public void setFlowDesc(String flowDesc) {
 		this.flowDesc = flowDesc;
 	}
+
+	public int getRecordResult() {
+		return recordResult;
+	}
+
+	public void setRecordResult(int recordResult) {
+		this.recordResult = recordResult;
+	}
+	
 	
 }

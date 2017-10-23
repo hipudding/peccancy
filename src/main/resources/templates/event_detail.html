@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="">
+<meta name="author" content="">
+
+<title>违规管理系统</title>
+
+<!-- Bootstrap Core CSS -->
+<link href="/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- MetisMenu CSS -->
+<link href="/css/metisMenu.min.css" rel="stylesheet">
+<link href="/css/dataTables.bootstrap.css" rel="stylesheet">
+
+<!-- Custom CSS -->
+<link href="/css/sb-admin-2.css" rel="stylesheet">
+
+<!-- Custom Fonts -->
+<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link href="/css/dataTables.responsive.css" rel="stylesheet">
+
+<link href="/css/blueimp-gallery.min.css" rel="stylesheet">
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+<style>
+.image {
+	float: left;
+	margin-right: 9px;
+	margin-bottom: 9px;
+	width: 200px;
+	height: 200px;
+	background: no-repeat 50%;
+	background-size: cover
+}
+</style>
+</head>
+
+<body>
+	<div id="wrapper">
+		<!-- Navigation -->
+		<nav class="navbar navbar-default navbar-static-top" role="navigation"
+			style="margin-bottom: 0">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse"
+					data-target=".navbar-collapse">
+					<span class="sr-only">Toggle navigation</span> <span
+						class="icon-bar"></span> <span class="icon-bar"></span> <span
+						class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="index.html">违规管理系统</a>
+			</div>
+			<ul class="nav navbar-top-links navbar-right">
+				<li class="dropdown"><a class="dropdown-toggle"
+					data-toggle="dropdown" href="#"> <i class="fa fa-user fa-fw"></i>
+						<i class="fa fa-caret-down"></i>
+				</a>
+					<ul class="dropdown-menu dropdown-user">
+						<li><a href="login-lujie.html"><i
+								class="fa fa-sign-out fa-fw"></i> Logout</a></li>
+					</ul> <!-- /.dropdown-user --></li>
+			</ul>
+			<!-- /.navbar-header -->
+			<!-- /.navbar-top-links -->
+
+			<div class="navbar-default sidebar" role="navigation">
+				<div class="sidebar-nav navbar-collapse">
+					<ul class="nav" id="side-menu">
+						<li><a href="event_table"><i
+								class="fa fa-envelope-o fa-fw"></i>事件管理</a></li>
+						<li><a href="event_detail" class="active"><i
+								class="fa fa-dashboard fa-fw"></i>进度管理</a></li>
+						<li><a href="user_table"><i class="fa fa-user fa-fw"></i>用户管理</a>
+						</li>
+						<li><a href="type_management"><i class="fa fa-gear fa-fw"></i>类别管理</a>
+						</li>
+						<li><a href="flow_management"><i
+								class="fa fa-arrow-right fa-fw"></i>流程管理</a></li>
+					</ul>
+				</div>
+				<!-- /.sidebar-collapse -->
+			</div>
+			<!-- /.navbar-static-side -->
+		</nav>
+
+		<!-- Page Content -->
+		<div id="page-wrapper">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-12">
+						<h3 class="page-header" th:text="'编号	'+${event.eventNo}"></h3>
+						<h4 class="page-header user-info">
+							用户信息
+							<h5 class="name" th:text = "'姓名: ' + ${event.customer.name}"></h5>
+							<h5 class="tel" th:text = "'电话: ' + ${event.customer.tel}"></h5>
+							<h5 class="card-id" th:text = "'身份信息： ' + ${event.customer.identify}"></h5>
+						</h4>
+						<h4 class="page-header">内容</h4>
+						<h4 th:text="${event.text}"></h4>
+					</div>
+					<div class="col-lg-12">
+						<!-- /.panel-heading -->
+						<h4 class="page-header">进度</h4>
+						<div >
+							<div style="margin:5px;" th:each="flow:${event.flows}">
+								<img th:src = "'/img/' + ${flow.icon} + '.png'"></img>
+								<a th:text="${flow.flowDesc}" disabled="true"></a>
+							</div>
+							<!-- .panel-body -->
+						</div>
+						<!-- /.panel -->
+					</div>
+					<div class="col-lg-12">
+						<h4 class="page-header">图片：</h4>
+						<div id="links">
+						<a th:each="img:${event.images}" class="image" th:href="'/' + ${img}"
+							th:style="'background-image: url(/' + ${img} +');'"></a>
+						</div>
+					</div>
+					<div id = "resultBlock" style="display:none" class="col-lg-12">
+						<h4 class="page-header">处理意见：</h4>
+						<div class="form-group">
+							<textarea id = "resultInfo" class="form-control" rows="3" th:text="${event.result}"></textarea>
+						</div>
+					</div>
+					<div class="col-lg-12">
+					<button style="float: right;" type="button"
+							class="btn btn-primary btn-lg">下一步</button>
+					</div>
+					<p id = "showTextArea" style="display:none" th:text="${event.showInputResult}"></p>
+					<p id = "eventFinish" style="display:none" th:text="${event.eventFinish}"></p>
+					<!-- /.col-lg-12 -->
+				</div>
+				<br>
+				<br>
+				<!-- /.row -->
+			</div>
+			<!-- /.container-fluid -->
+			<!-- The Gallery as lightbox dialog, should be a child element of the document body -->
+			<div id="blueimp-gallery" class="blueimp-gallery">
+				<div class="slides"></div>
+				<h3 class="title"></h3>
+				<a class="prev">‹</a> <a class="next">›</a> <a class="close">×</a> <a
+					class="play-pause"></a>
+				<ol class="indicator"></ol>
+			</div>
+		</div>
+		<!-- /#page-wrapper -->
+
+	</div>
+	<!-- /#wrapper -->
+
+	<!-- jQuery -->
+	<script src="/js/jquery.min.js"></script>
+
+	<!-- Bootstrap Core JavaScript -->
+	<script src="/js/bootstrap.min.js"></script>
+
+	<!-- Metis Menu Plugin JavaScript -->
+	<script src="/js/metisMenu.min.js"></script>
+	<script src="/js/jquery.dataTables.min.js"></script>
+
+	<!-- Custom Theme JavaScript -->
+	<script src="/js/sb-admin-2.js"></script>
+	<script src="/js/dataTables.responsive.js"></script>
+
+	<script src="/js/dataTables.bootstrap.min.js"></script>
+	
+	<script src="/js/blueimp-gallery.min.js"></script>
+
+	<script>
+	
+	$(function(){
+		document.getElementById('links').onclick = function (event) {
+		    event = event || window.event;
+		    var target = event.target || event.srcElement,
+		        link = target.src ? target.parentNode : target,
+		        options = {index: link, event: event},
+		        links = this.getElementsByTagName('a');
+		    blueimp.Gallery(links, options);
+		};
+		
+		var resultBlock = $("#resultBlock");
+		var resultInfo = $("#resultInfo");
+		var showTextArea = $("#showTextArea");
+		if(resultInfo.val().length != 0||showTextArea.text() == "true")
+			resultBlock.show();
+		
+	});
+		
+	</script>
+
+</body>
+
+</html>

@@ -4,45 +4,84 @@ import java.util.List;
 
 public class EventShowType {
 
-		String text;
-		
-		String result;
-		
-		List<String> images;
-		
-		List<FlowHistoryType> flows;
+	String eventNo;
+	
+	String text;
 
-		public String getText() {
-			return text;
-		}
+	String result;
+	
+	boolean showInputResult;
+	
+	boolean eventFinish;
 
-		public void setText(String text) {
-			this.text = text;
-		}
+	List<String> images;
 
-		public String getResult() {
-			return result;
-		}
+	List<FlowHistoryType> flows;
+	
+	CustomerInfoType customer;
 
-		public void setResult(String result) {
-			this.result = result;
-		}
+	public String getText() {
+		return text;
+	}
 
-		public List<String> getImages() {
-			return images;
-		}
+	public void setText(String text) {
+		this.text = text;
+	}
 
-		public void setImages(List<String> images) {
-			this.images = images;
-		}
+	public String getResult() {
+		return result;
+	}
 
-		public List<FlowHistoryType> getFlows() {
-			return flows;
-		}
+	public void setResult(String result) {
+		this.result = result;
+	}
 
-		public void setFlows(List<FlowHistoryType> flows) {
-			this.flows = flows;
-		}
-		
-		
+	public List<String> getImages() {
+		return images;
+	}
+
+	public void setImages(List<String> images) {
+		this.images = images;
+	}
+
+	public List<FlowHistoryType> getFlows() {
+		return flows;
+	}
+
+	public void setFlows(List<FlowHistoryType> flows) {
+		this.flows = flows;
+	}
+
+	public String getEventNo() {
+		return eventNo;
+	}
+
+	public void setEventNo(String eventNo) {
+		this.eventNo = eventNo;
+	}
+
+	public CustomerInfoType getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(CustomerInfoType customer) {
+		this.customer = customer;
+	}
+
+	public boolean isShowInputResult() {
+		return showInputResult;
+	}
+
+	public void setShowInputResult(boolean showInputResult) {
+		this.showInputResult = showInputResult;
+	}
+
+	public boolean isEventFinish() {
+		return eventFinish;
+	}
+
+	public void setEventFinish(boolean eventFinish) {
+		this.eventFinish = eventFinish;
+	}
+
 }

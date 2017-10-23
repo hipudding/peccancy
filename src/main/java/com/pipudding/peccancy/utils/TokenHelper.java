@@ -37,7 +37,7 @@ public class TokenHelper {
 		{
 			tokenLastTime = (currentTimestamp.getTime() - lastTokenTime.getTime())/1000;
 		}
-		if(true||token == null || tokenLastTime >= validTime)
+		if(token == null || tokenLastTime >= validTime)
 			token = requestToken();
 		return token;
 	}

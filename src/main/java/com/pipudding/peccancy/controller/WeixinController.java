@@ -9,16 +9,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.pipudding.peccancy.service.WeixinService;
+import com.pipudding.peccancy.service.WeixinService;
 import com.pipudding.peccancy.utils.CustomerInfoType;
 import com.pipudding.peccancy.utils.EventListType;
 import com.pipudding.peccancy.utils.EventShowType;
 
 @Controller
+@RequestMapping("/weixin") 
 public class WeixinController {
 	
 	@Autowired
-	WeixinService weixinService;
+	WeixinService weixinService;
 	
 	@RequestMapping("/postevent")  
     public String postEvent() {  

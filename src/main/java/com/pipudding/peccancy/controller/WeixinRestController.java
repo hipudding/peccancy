@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.pipudding.peccancy.service.WeixinService;
+import com.pipudding.peccancy.service.WeixinService;
 import com.pipudding.peccancy.utils.CustomerInfoType;
 import com.pipudding.peccancy.utils.EvenInfoType;
 import com.pipudding.peccancy.utils.EventType;
@@ -34,9 +34,7 @@ public class WeixinRestController {
 	String myToken;
 	
 	@Autowired
-	WeixinService weixinService;
-
-	
+	WeixinService weixinService;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
     String weixinIndentity(String echostr,String timestamp,String nonce,String signature) {
@@ -50,14 +48,14 @@ public class WeixinRestController {
         return "";
     }
 	
-	@RequestMapping(value = "/", method = RequestMethod.POST)
+	/*@RequestMapping(value = "/", method = RequestMethod.POST)
 	String weixinMessage(HttpServletRequest request) throws IOException
 	{
 		InputStream inputStream = request.getInputStream();
 		Scanner s = new Scanner(inputStream).useDelimiter("\\A");
 		String result = s.hasNext() ? s.next() : "";
 		return "123";
-	}
+	}*/
 	
 	@RequestMapping(value = "/imgupload", method = RequestMethod.POST)
 	public ResultType imageUpload(@RequestParam(value = "fileVal") MultipartFile file) throws IllegalStateException, IOException {	
