@@ -34,6 +34,7 @@ import com.pipudding.peccancy.utils.EventListType;
 import com.pipudding.peccancy.utils.EventResultType;
 import com.pipudding.peccancy.utils.EventShowType;
 import com.pipudding.peccancy.utils.EventType;
+import com.pipudding.peccancy.utils.EventTypeSubmit;
 import com.pipudding.peccancy.utils.FlowHistoryType;
 import com.pipudding.peccancy.utils.JsapiType;
 import com.pipudding.peccancy.utils.TokenHelper;
@@ -413,7 +414,7 @@ public class WeixinService {
 		userDao.saveOrUpdate(user);
 	}
 	
-	public boolean login(UserLoginInfoType loginType)
+	public boolean login(UserLoginInfoType loginType,StringBuffer userId,StringBuffer userName)
 	{
 		String hql = "FROM user WHERE user_name = ?0";
 		List<UserEntity> userList = userDao.findByHQL(hql, loginType.getUserName());
@@ -427,12 +428,16 @@ public class WeixinService {
 			encript = DigestUtils.sha256Hex(loginType.getPassword());
 			user.setPassword(encript);
 			userDao.saveOrUpdate(user);
+			userId.append(user.getUserId());
+			userName.append(user.getUserName());
 			return true;
 		}
 		
 		encript = DigestUtils.sha256Hex(loginType.getPassword());
 		if(encript.equals(user.getPassword()))
 		{
+			userId.append(user.getUserId());
+			userName.append(user.getUserName());
 			return true;
 		}
 		else
@@ -455,6 +460,62 @@ public class WeixinService {
 		api.setAppid("wxcab1dccd3a31b5eb");
 		
 		return api;
+	}
+	
+	public void updateFlowInfo(String[] flowNames)
+	{
+		String hql = "UPDATE flow f SET f.expired= ?0";
+		flowDao.executeHQL(hql, 1);
+		int flowNo = 0;
+		String flowGroup = UUID.randomUUID().toString();
+		for(String flowName:flowNames)
+		{
+			FlowEntity flow = new FlowEntity();
+			
+			
+			String flowId = UUID.randomUUID().toString();
+			flow.setFlowId(flowId);
+			flow.setExpired(0);
+			flow.setFlowGroup(flowGroup);
+			flow.setFlowNo(flowNo);
+			if(flowName.startsWith(">"))
+			{
+				flowName = flowName.substring(1);
+				flow.setRecordResult(1);
+			}
+			else
+			{
+				flow.setRecordResult(0);
+			}
+			flow.setFlowDesc(flowName);
+
+			flowDao.save(flow);
+			flowNo ++;
+		}
+	}
+	
+	public void updateTypeInfo(EventTypeSubmit[] types)
+	{
+		String hql = "DELETE FROM event_type";
+		eventTypeDao.executeHQL(hql);
+		
+		for(EventTypeSubmit type:types)
+		{
+			EventTypeEntity level1 = new EventTypeEntity();
+			level1.setTypeId(UUID.randomUUID().toString());
+			level1.setTypeDesc(type.getLabel());
+			level1.setParent("0");
+			eventTypeDao.save(level1);
+			
+			for(String child:type.getChildren())
+			{
+				EventTypeEntity level2 = new EventTypeEntity();
+				level2.setParent(level1.getTypeId());
+				level2.setTypeDesc(child);
+				level2.setTypeId(UUID.randomUUID().toString());
+				eventTypeDao.save(level2);
+			}
+		}
 	}
 	
 }

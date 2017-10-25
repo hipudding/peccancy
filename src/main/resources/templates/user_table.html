@@ -197,7 +197,7 @@
             var param = {};
             param.userId = userId;
             $.ajax({
-                    url : "/manage/resetPassword/"+ userId,
+                    url : "/admin/resetPassword/"+ userId,
                     type : "POST",
                     contentType: "application/json;charset=utf-8",
                     data : JSON.stringify(param),
@@ -216,7 +216,7 @@
             param.userName = userName;
             param.userEmail = userEmail;
             $.ajax({
-                    url : "/manage/createuser",
+                    url : "/admin/createuser",
                     type : "POST",
                     contentType: "application/json;charset=utf-8",
                     data : JSON.stringify(param),

@@ -12,6 +12,9 @@ public class WebAppConfig extends WebMvcConfigurerAdapter{
         // addPathPatterns 用于添加拦截规则
         // excludePathPatterns 用户排除拦截
         registry.addInterceptor(new WeixinInterceptor()).addPathPatterns("/weixin/**");
+        registry.addInterceptor(new ManageInterceptor()).addPathPatterns("/manage/**").excludePathPatterns("/manage/login").excludePathPatterns("/manage/dologin");
+        registry.addInterceptor(new AdminInterceptor()).addPathPatterns("/admin/**");
+
         super.addInterceptors(registry);
     }
 }

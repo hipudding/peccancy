@@ -135,40 +135,15 @@
 
                     <!-- /.col-lg-12 -->
                     <div class="col-lg-12 type-body">
-                        <div class="col-lg-4" id="1">
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    交通违章
+                        <div class="col-lg-4" th:id = "${eventType.value}" th:each = "eventType:${eventTypes}">
+                            <div class="panel panel-info" >
+                                <div class="panel-heading" >
+                                    <span class = 'level1-info' th:text = "${eventType.label}"></span>
                                     <button type="button" class="close" onclick="deletType(this)">×</button>
                                 </div>
                                 <div class="panel-body">
-                                    <div class="alert alert-info">
-                                        违规占道停车
-                                        <button type="button" class="close" onclick="deletChild(this)">×</button>
-                                    </div>
-                                    <div class="alert alert-info">
-                                        闯红灯
-                                        <button type="button" class="close" onclick="deletChild(this)">×</button>
-                                    </div>
-                                </div>
-                                <div class="panel-footer add-type-child">
-                                    <button type="button" class="btn btn-info" style="width:100%;" onclick="addTypeChildInfo(this)">添加</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4" id="2">
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    环境举报
-                                    <button type="button" class="close" onclick="deletType(this)">×</button>
-                                </div>
-                                <div class="panel-body">
-                                    <div class="alert alert-info">
-                                        冒黑烟
-                                        <button type="button" class="close" onclick="deletChild(this)">×</button>
-                                    </div>
-                                    <div class="alert alert-info">
-                                        汽车尾气
+                                    <div class="alert alert-info" th:each = "child:${eventType.children}">
+                                        <span class = 'level2-info' th:text = "${child.label}"></span>
                                         <button type="button" class="close" onclick="deletChild(this)">×</button>
                                     </div>
                                 </div>
@@ -222,12 +197,40 @@
 
     <!-- Custom Theme JavaScript -->
     <script src="/js/sb-admin-2.js"></script>
+    <script src="/js/uuid.js"></script>
     <!-- <script src="../vendor/datatables-responsive/dataTables.responsive.js"></script> -->
     
     <script src="/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript">
         function submitAllInfo(obj){
-            
+            var params = [];
+            $('.level1-info').each(function(index,obj){
+                var level1Info = $(obj).text();
+                var param = {};
+                var level2Infos = [];
+                param.label = level1Info;
+                $(obj).parent().parent().find('.level2-info').each(function(i,obj2){
+                    // alert($(obj2).text());
+                    level2Infos[i] = $(obj2).text();
+                });
+                param.children = level2Infos;
+                params[index] = param;
+            });
+            console.log(params);
+            $.ajax({
+                    url : "/admin/updatetypeinfo",
+                    type : "POST",
+                    contentType: "application/json;charset=utf-8",
+                    data : JSON.stringify(params),
+                    dataType : "json",
+                    success : function(ret) {
+                        window.location.reload();
+                        alert("更新成功");
+                    },
+                    error:function(msg){
+                            
+                    }
+                  }) 
         }
         function addTypeChildInfo(obj){
             var typeID = $(obj).parent().parent().parent().attr("id");
@@ -237,7 +240,9 @@
         }
         function submitTypeInfo(obj){
             var typeName = $(obj).parent().parent().find(".type-name").val();
-            var htmlAdd = "<div class='col-lg-4' id='3'><div class='panel panel-info'><div class='panel-heading'>"+typeName+"<button type='button' class='close' onclick='deletType(this)'>×</button></div><div class='panel-body'></div><div class='panel-footer add-type-child'><button type='button' class='btn btn-info' style='width:100%;' onclick='addTypeChildInfo(this)'>添加</button></div></div></div>";
+            $(obj).parent().parent().find(".type-name").val('');
+            var uuid = Math.uuid();
+            var htmlAdd = "<div class='col-lg-4' id='"+uuid+"'><div class='panel panel-info'><div class='panel-heading'><span class = 'level1-info'>"+typeName+"</span><button type='button' class='close' onclick='deletType(this)'>×</button></div><div class='panel-body'></div><div class='panel-footer add-type-child'><button type='button' class='btn btn-info' style='width:100%;' onclick='addTypeChildInfo(this)'>添加</button></div></div></div>";
             $(".type-body").append(htmlAdd);
         }
         function deletType(obj){
@@ -249,10 +254,12 @@
         }
         function submitTypeChild(obj){
             var childName = $(obj).parent().parent().find(".type-child-name").val();
+            $(obj).parent().parent().find(".type-child-name").val('');
             var typeId = $(obj).parent().parent().find(".type-child-name").attr("name");
-            var htmlAdd = "<div class='alert alert-info'><button type='button' class='close' onclick='deletChild(this)'>×</button>"+childName+"</div>";
+            var htmlAdd = "<div class='alert alert-info'><span class = 'level2-info'>"+childName+"</span><button type='button' class='close' onclick='deletFlow(this)'>×</button></div>";
             $("#"+typeId).find(".panel-body").append(htmlAdd);
         }
+        
     </script>
 
 </body>

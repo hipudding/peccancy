@@ -113,9 +113,9 @@
                                 <div class="panel-heading">
                                     流程操作
                                 </div>
-                                <div class="panel-body">
-                                    <div class="alert alert-info" th:each = "flow:${flows}">
-                                        <p th:text = "${flow}"></p>
+                                <div class="panel-body all-flow-info">
+                                    <div class="alert alert-info" onclick="setResult(this)" th:each = "flow:${flows}">
+                                        <span class = 'flow-info' th:text = "${flow}"></span>
                                         <button type="button" class="close" onclick="deletFlow(this)">×</button>
                                     </div>
                                 </div>
@@ -174,6 +174,34 @@
     <script src="/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript">
         function submitAllInfo(obj){
+        	if($('.alert-danger').length>0){
+                alert('cunzai');
+                var params = [];
+                $('.flow-info').each(function(index,obj){
+                    var flowInfo = $(obj).text();
+					if($(obj).parent().hasClass('alert-danger')){
+	                		flowInfo = ">" + flowInfo;
+	                	}
+                    params[index] = flowInfo;
+                });
+                alert(params);
+                $.ajax({
+                        url : "/admin/updateflowinfo",
+                        type : "POST",
+                        contentType: "application/json;charset=utf-8",
+                        data : JSON.stringify(params),
+                        dataType : "json",
+                        success : function(ret) {
+                            window.location.reload();
+                            alert("更新成功");
+                        },
+                        error:function(msg){
+                                
+                        }
+                      }) 
+            }else{
+                alert('bucunzai');
+            }
             
         }
         function addFlowInfo(obj){
@@ -181,11 +209,16 @@
         }
         function submitFlowInfo(obj){
             var flowName = $(obj).parent().parent().find(".flow-name").val();
-            var htmlAdd = "<div class='alert alert-info'><button type='button' class='close' onclick='deletFlow(this)'>×</button>"+flowName+"</div>";
+            $(obj).parent().parent().find(".flow-name").val('');
+            var htmlAdd = "<div class='alert alert-info' onclick='setResult(this)'><span class = 'flow-info' >"+flowName+"</span><button type='button' class='close' onclick='deletFlow(this)'>×</button></div>";
             $(".panel-body").append(htmlAdd);
         }
         function deletFlow(obj){
             $(obj).parent().remove();
+        }
+        function setResult(obj){
+            $(obj).attr('class','alert alert-danger');
+            $($(obj).siblings()).attr('class','alert alert-info');
         }
     </script>
 
