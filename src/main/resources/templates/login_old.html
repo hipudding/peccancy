@@ -56,7 +56,7 @@
                                     </label>
                                 </div>
                                 <!-- Change this to a button or input when using this as a form -->
-                                <a class="btn btn-lg btn-info btn-block" id="longin" onclick="submitLoginInfo(this)">登录</a>
+                                <a class="btn btn-lg btn-info btn-block" id="longin" onclick="submitFlowInfo(this)">登录</a>
                             </fieldset>
                         </form>
                     </div>
@@ -77,30 +77,10 @@
     <!-- Custom Theme JavaScript -->
     <script src="/js/sb-admin-2.js"></script>
     <script>
-        function submitLoginInfo(obj){
+        function submitFlowInfo(obj){
             var userName = $(obj).parent().find(".user-name").val();
             var password = $(obj).parent().find(".user-password").val();
-            // alert(userName+"-"+password);
-            var param = {};
-            param.userName = userName;
-            param.password = password;
-            $.ajax({
-                    url : "/manage/dologin",
-                    type : "POST",
-                    contentType: "application/json;charset=utf-8",
-                    data : JSON.stringify(param),
-                    dataType : "json",
-                    success : function(ret) {
-                        if(ret.resultCode == "success")
-                        		alert("ok");
-                        else
-                        		alert("error");
-                    
-                    },
-                    error:function(msg){
-                    		alert("errror");
-                    }
-                  }) 
+            alert(userName+"-"+password);
         }
     </script>
 

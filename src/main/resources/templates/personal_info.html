@@ -111,9 +111,10 @@ label>* {
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&key=b08ce4afba6261f6d3ad9f3a46b9f7aa"></script>
 	<script type="text/javascript" class="input js_show">
+	
 		$(function() {
-
 			var $tooltips = $('.js_tooltips');
 			function showError(error_msg) {
 				if ($tooltips.css('display') != 'none')
@@ -145,7 +146,7 @@ label>* {
 					return false;
 				}
 	             $.ajax({
-	                url : "/postcustomerinfo",
+	                url : "/weixin/postcustomerinfo",
 	                type : "POST",
 	                contentType: "application/json;charset=utf-8",
 	                data : JSON.stringify({'name':name,'tel':tel,'identify':identify}),
@@ -158,9 +159,11 @@ label>* {
 	                	$('#commit').addClass("weui-btn_disabled");
 	                  if (ret.resultCode == "success") {
 	                	  	weui.toast('操作成功', {
-	      			        duration: 3000,
-	      			        className: "bears"
+	      			        duration: 2000,
+	      			        className: "bears",
+	      			      	callback: function(){ wx.closeWindow()}
 	      			    	});
+	                	  	
 	                  } else {
 	                	  	showError("服务器繁忙");
 	                  }

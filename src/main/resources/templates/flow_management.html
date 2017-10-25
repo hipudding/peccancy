@@ -98,7 +98,13 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1 class="page-header">流程管理</h1>
+                        <h1 class="page-header">
+                            流程管理
+                            <button style="float: right;" id="submitAllInfo" onclick="submitAllInfo(this)" class="btn btn-info btn-lg">
+                                提交
+                            </button>
+                        </h1>
+                        
                     </div>
                     <!-- /.col-lg-12 -->
                     <div class="col-lg-12 type-body">
@@ -108,12 +114,8 @@
                                     流程操作
                                 </div>
                                 <div class="panel-body">
-                                    <div class="alert alert-info">
-                                        用户已提交举报信息
-                                        <button type="button" class="close" onclick="deletFlow(this)">×</button>
-                                    </div>
-                                    <div class="alert alert-info">
-                                        管理员审核真实性
+                                    <div class="alert alert-info" th:each = "flow:${flows}">
+                                        <p th:text = "${flow}"></p>
                                         <button type="button" class="close" onclick="deletFlow(this)">×</button>
                                     </div>
                                 </div>
@@ -171,6 +173,9 @@
     
     <script src="/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript">
+        function submitAllInfo(obj){
+            
+        }
         function addFlowInfo(obj){
             $('#addFlowInfoModal').modal();
         }

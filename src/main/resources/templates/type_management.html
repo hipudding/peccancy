@@ -98,10 +98,15 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-12">
-                        <h1 class="page-header">类别管理</h1>
+                         <h1 class="page-header">
+                            类别管理
+                            <button style="float: right;" id="submitAllInfo" onclick="submitAllInfo(this)" class="btn btn-info btn-lg">
+                                提交
+                            </button>
+                        </h1>
                     </div>
                     <div class="col-lg-2" style="float: right;margin-bottom: 5px;">
-                        <button class="btn btn-primary btn-lg add-type-info"  data-toggle="modal" data-target="#addTypeModal">
+                        <button style="float: right;" class="btn btn-primary btn-lg add-type-info"  data-toggle="modal" data-target="#addTypeModal">
                             添加类别
                         </button>
                         <div class="modal fade" id="addTypeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
@@ -221,6 +226,9 @@
     
     <script src="/js/dataTables.bootstrap.min.js"></script>
     <script type="text/javascript">
+        function submitAllInfo(obj){
+            
+        }
         function addTypeChildInfo(obj){
             var typeID = $(obj).parent().parent().parent().attr("id");
             // alert(typeID);

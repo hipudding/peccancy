@@ -98,7 +98,7 @@
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
-						<h3 class="page-header" th:text="'编号	'+${event.eventNo}"></h3>
+						<h3 class="page-header" >编号<span id="eventID" th:text="${event.eventNo}"></span></h3>
 						<h4 class="page-header user-info">
 							用户信息
 							<h5 class="name" th:text = "'姓名: ' + ${event.customer.name}"></h5>
@@ -127,6 +127,10 @@
 							th:style="'background-image: url(/' + ${img} +');'"></a>
 						</div>
 					</div>
+					<div class="col-lg-12">
+						<h4 class="page-header">地图：</h4>
+						<div id="container" tabindex="0" style="height:400px"></div>
+					</div>
 					<div id = "resultBlock" style="display:none" class="col-lg-12">
 						<h4 class="page-header">处理意见：</h4>
 						<div class="form-group">
@@ -134,11 +138,13 @@
 						</div>
 					</div>
 					<div class="col-lg-12">
-					<button style="float: right;" type="button"
+					<button style="float: right;" type="button" id="submitResult" onclick="submitResult()"
 							class="btn btn-primary btn-lg">下一步</button>
 					</div>
 					<p id = "showTextArea" style="display:none" th:text="${event.showInputResult}"></p>
 					<p id = "eventFinish" style="display:none" th:text="${event.eventFinish}"></p>
+					<p id = "longitude" style="display:none" th:text="${event.longitude}"></p>
+					<p id = "latitude" style="display:none" th:text="${event.latitude}"></p>
 					<!-- /.col-lg-12 -->
 				</div>
 				<br>
@@ -177,9 +183,9 @@
 	<script src="/js/dataTables.bootstrap.min.js"></script>
 	
 	<script src="/js/blueimp-gallery.min.js"></script>
+	<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&key=b08ce4afba6261f6d3ad9f3a46b9f7aa"></script>
 
 	<script>
-	
 	$(function(){
 		document.getElementById('links').onclick = function (event) {
 		    event = event || window.event;
@@ -195,8 +201,87 @@
 		var showTextArea = $("#showTextArea");
 		if(resultInfo.val().length != 0||showTextArea.text() == "true")
 			resultBlock.show();
+		if(resultInfo.val().length != 0)
+			$("#resultInfo").attr("disabled","disabled");
 		
+		var eventFinish = $("#eventFinish");
+		if(eventFinish.text() == "true")
+		{
+			$("#submitResult").attr("disabled","disabled");
+			$("#submitResult").css("display","none");
+		}
+		
+		var longitude = $("#longitude").text();
+		var latitude = $("#latitude").text();
+		showLocationName(longitude,latitude);
 	});
+	
+	function submitResult(){
+            var result = $("#resultInfo").val();
+            var eventID = $("#eventID").text();
+            alert(result+"-"+eventID);
+            var param = {};
+            param.eventId = eventID;
+            param.result = result;
+            $.ajax({
+                    url : "/manage/next",
+                    type : "POST",
+                    contentType: "application/json;charset=utf-8",
+                    data : JSON.stringify(param),
+                    dataType : "json",
+                    success : function(ret) {
+                    		window.location.reload();
+                    },
+                    error:function(msg){
+                    		
+                    }
+                  }) 
+        }
+	
+	function showLocationName(longitude,latitude)
+	{
+		AMap.service('AMap.Geocoder',function(){//回调函数
+		    //实例化Geocoder
+		    var geocoder = new AMap.Geocoder({
+		        
+		    });
+		    var lnglatXY=[longitude, latitude];//地图上所标点的坐标
+			geocoder.getAddress(lnglatXY, function(status, result) {
+			    if (status === 'complete' && result.info === 'OK') {
+			      	var title = result.regeocode.formattedAddress
+			      	showMap(longitude,latitude,title);
+			    }else{
+			       //获取地址失败
+			    }
+			});  
+		})
+		
+	}
+	
+	function showMap(longitude,latitude,title)
+	{
+		var map = new AMap.Map('container',{
+	        resizeEnable: true,
+	        zoom: 15,
+	        center: [longitude, latitude]
+	    });
+		
+		
+		marker = new AMap.Marker({
+			position:[longitude, latitude],
+			title:title,
+			map:map
+		});
+		var infoWindow = new AMap.InfoWindow();
+		marker.content= title;
+		marker.on('click', function(e){
+			infoWindow.setContent(e.target.content);
+		    infoWindow.open(map, e.target.getPosition());
+		});
+		
+		map.setFitView();
+	}
+
 		
 	</script>
 

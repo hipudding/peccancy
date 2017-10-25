@@ -71,7 +71,7 @@ label>* {
 				<div class="weui-cells__title">列表</div>
 				<div class="weui-cells">
 
-					<a class="weui-cell weui-cell_access" th:href="'/eventshow/'+${event.eventId}" th:each="event: ${eventList}">
+					<a class="weui-cell weui-cell_access" th:href="'/weixin/eventshow/'+${event.eventId}" th:each="event: ${eventList}">
 						<div class="weui-cell__hd">
 							<i th:class="'weui-icon-'+${event.icon}" ></i>
 						</div>

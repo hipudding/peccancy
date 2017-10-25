@@ -75,7 +75,7 @@ label>* {
 		<div class="page input js_show">
 			<div class="page__hd">
 				<h1 class="page__title">事件内容</h1>
-				<p class="page__desc">201710202034111</p>
+				<p class="page__desc" th:text = ${event.eventNo}></p>
 			</div>
 			<div class="page__bd">
 			
@@ -100,31 +100,25 @@ label>* {
 							</div>
 					</div>
 				</div>
-				
+				<div class="weui-cells__title">地图</div>
+				<div class="weui-cell" id = "map" style="height:160px">
+					
+				</div>
 				<div class="weui-cells__title">处理结果</div>
 				<div class="weui-cell">
 					<p th:text = "${event.result}"></p>
 				</div>
-				
+				<p id = "showTextArea" style="display:none" th:text="${event.showInputResult}"></p>
+				<p id = "eventFinish" style="display:none" th:text="${event.eventFinish}"></p>
+				<p id = "longitude" style="display:none" th:text="${event.longitude}"></p>
+				<p id = "latitude" style="display:none" th:text="${event.latitude}"></p>
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&key=b08ce4afba6261f6d3ad9f3a46b9f7aa"></script>
 	<script type="text/javascript" class="input js_show">
 		$(function() {
-			var $tooltips = $('.js_tooltips');
-
-			$('#showTooltips').on('click', function() {
-				if ($tooltips.css('display') != 'none')
-					return;
-
-				// toptips的fixed, 如果有`animation`, `position: fixed`不生效
-				$('.page.cell').removeClass('slideIn');
-
-				$tooltips.css('display', 'block');
-				setTimeout(function() {
-					$tooltips.css('display', 'none');
-				}, 2000);
-			});
+			
 
 			// 缩略图预览
 			document.querySelector('#uploaderFiles').addEventListener(
@@ -147,7 +141,56 @@ label>* {
 							className : 'custom-name',
 						});
 					});
+			var longitude = $("#longitude").text();
+			var latitude = $("#latitude").text();
+			showLocationName(longitude,latitude);
 		});
+		
+		function showLocationName(longitude,latitude)
+		{
+			AMap.service('AMap.Geocoder',function(){//回调函数
+			    //实例化Geocoder
+			    var geocoder = new AMap.Geocoder({
+			        
+			    });
+			    var lnglatXY=[longitude, latitude];//地图上所标点的坐标
+				geocoder.getAddress(lnglatXY, function(status, result) {
+				    if (status === 'complete' && result.info === 'OK') {
+				      	var title = result.regeocode.formattedAddress
+				      	showMap(longitude,latitude,title);
+				    }else{
+				       //获取地址失败
+				    }
+				});  
+			})
+			
+		}
+		
+		function showMap(longitude,latitude,title)
+		{
+			var map = new AMap.Map('map',{
+		        resizeEnable: true,
+		        zoom: 15,
+		        center: [longitude, latitude]
+		    });
+			
+			
+			marker = new AMap.Marker({
+				position:[longitude, latitude],
+				title:title,
+				map:map
+			});
+			var infoWindow = new AMap.InfoWindow();
+			marker.content= title;
+			marker.on('click', function(e){
+				infoWindow.setContent(e.target.content);
+			    infoWindow.open(map, e.target.getPosition());
+			});
+			
+			map.setFitView();
+		}
+		
+		
 	</script>
 </body>
 </html>

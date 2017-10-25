@@ -97,6 +97,10 @@ label>* {
 						</div>
 					</div>
 				</div>
+				<div class="weui-cells__title">地图</div>
+				<div class="weui-cell" id = "map" style="height:160px">
+					
+				</div>
 				<div class="weui-cells__title">描述</div>
 				<div class="weui-cells weui-cells_form">
 					<div class="weui-cell">
@@ -115,9 +119,95 @@ label>* {
 			</div>
 		</div>
 	</div>
+	<script src = "https://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+	<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.0&key=b08ce4afba6261f6d3ad9f3a46b9f7aa"></script>
 	<script type="text/javascript" class="input js_show">
+	var longitude = "";
+	var latitude = "";
+	function showLocationName(longitude,latitude)
+	{
+		AMap.service('AMap.Geocoder',function(){//回调函数
+		    //实例化Geocoder
+		    var geocoder = new AMap.Geocoder({
+		        
+		    });
+		    var lnglatXY=[longitude, latitude];//地图上所标点的坐标
+			geocoder.getAddress(lnglatXY, function(status, result) {
+			    if (status === 'complete' && result.info === 'OK') {
+			      	var title = result.regeocode.formattedAddress
+			      	showMap(longitude,latitude,title);
+			    }else{
+			       //获取地址失败
+			    }
+			});  
+		})
+		
+	}
+	
+	function showMap(longitude,latitude,title)
+	{
+		var map = new AMap.Map('map',{
+	        resizeEnable: true,
+	        zoom: 15,
+	        center: [longitude, latitude]
+	    });
+		
+		
+		marker = new AMap.Marker({
+			position:[longitude, latitude],
+			title:title,
+			map:map
+		});
+		var infoWindow = new AMap.InfoWindow();
+		marker.content= title;
+		marker.on('click', function(e){
+			infoWindow.setContent(e.target.content);
+		    infoWindow.open(map, e.target.getPosition());
+		});
+		
+		map.setFitView();
+	}
+	
+	function getsdkinfo()
+	{
+		var url = window.location.href;
+		$.get("/weixin/jsapi",{url:url}, function (data) {
+            initjssdk(data.appid,data.timestamp,data.noncestr,data.jsapi_ticket);
+        });
+	}
+	
+	wx.ready(function(){
+		wx.getLocation({
+		    type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+		    success: function (res) {
+		        latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+		        longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+		        showLocationName(longitude,latitude);
+		    }
+		});
+	});
+	
+	wx.error(function(res){
+		showError("定位失败");
+	});
+	
+	function initjssdk(appId,timsstamp,nonceStr,signature)
+	{
+		wx.config({
+		    debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+		    appId: appId, // 必填，公众号的唯一标识
+		    timestamp: timsstamp, // 必填，生成签名的时间戳
+		    nonceStr: nonceStr, // 必填，生成签名的随机串
+		    signature: signature,// 必填，签名，见附录1
+		    jsApiList: ["openLocation","getLocation","closeWindow"] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+		});
+	}
+	
 		$(function() {	
-			$.get("/gettypes", null, function (data) {
+			
+			getsdkinfo();
+			
+			$.get("/weixin/gettypes", null, function (data) {
                 addPickerData(data);
             },"json");
 			
@@ -125,7 +215,7 @@ label>* {
 			var uploadCount = 0, uploadList = [];
 			var uploadCountDom = document.getElementById("uploadCount");
 			weui.uploader('#uploader', {
-			    url: '/imgupload',
+			    url: '/weixin/imgupload',
 			    auto: true,
 			    type: 'file',
 			    fileVal: 'fileVal',
@@ -277,6 +367,10 @@ label>* {
 			}
 			
 			$("#uploaderCustomBtn").on('click',function(){
+				
+				if($('#uploaderCustomBtn').hasClass("weui-btn_disabled"))
+					return false;
+				
 				var type = $(showPicker).text();
 				if(pickerSelected == false)
 				{
@@ -308,16 +402,24 @@ label>* {
 				param.text = info;
 				param.images = imageFileNames;
 				param.type = type;
+				param.longitude = longitude;
+				param.latitude = latitude;
 				
 				
 				$.ajax({
-	                url : "/posteventinfo",
+	                url : "/weixin/posteventinfo",
 	                type : "POST",
 	                contentType: "application/json;charset=utf-8",
 	                data : JSON.stringify(param),
 	                dataType : "json",
 	                success : function(ret) {
-	                	
+	                	$("#weui-uploader__bd").attr("disabled",true);
+	                	$('#uploaderCustomBtn').addClass("weui-btn_disabled");
+	                	weui.toast('操作成功', {
+	      			        duration: 2000,
+	      			        className: "bears",
+	      			        	callback: function(){ wx.closeWindow() }
+	      			    	});
 	                },
 	                error:function(msg){
 	                		showError("网络错误");

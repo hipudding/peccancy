@@ -34,8 +34,18 @@ public class EventEntity {
 	@Column(name = "commitor")
 	String  commitor;
 	
+	@Column(name = "longitude")
+	String longitude;
+	
+	@Column(name = "latitude")
+	String latitude;
+	
 	@Column(name = "finish")
 	int finish;
+	
+	@Column(name = "flow_count")
+	int flowCount;
+	
 
 	public String getEventId() {
 		return eventId;
@@ -108,6 +118,29 @@ public class EventEntity {
 	public void setFinish(int finish) {
 		this.finish = finish;
 	}
-	
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public int getFlowCount() {
+		return flowCount;
+	}
+
+	public void setFlowCount(int flowCount) {
+		this.flowCount = flowCount;
+	}
 	
 }

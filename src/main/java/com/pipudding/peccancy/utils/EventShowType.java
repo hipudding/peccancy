@@ -13,6 +13,12 @@ public class EventShowType {
 	boolean showInputResult;
 	
 	boolean eventFinish;
+	
+	String longitude;
+	
+	String latitude;
+	
+	int flowCount;
 
 	List<String> images;
 
@@ -83,5 +89,31 @@ public class EventShowType {
 	public void setEventFinish(boolean eventFinish) {
 		this.eventFinish = eventFinish;
 	}
+
+	public String getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
+	}
+
+	public String getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+
+	public int getFlowCount() {
+		return flowCount;
+	}
+
+	public void setFlowCount(int flowCount) {
+		this.flowCount = flowCount;
+	}
+	
+	
 
 }

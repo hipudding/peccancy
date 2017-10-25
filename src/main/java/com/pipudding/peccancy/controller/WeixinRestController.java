@@ -1,10 +1,8 @@
 package com.pipudding.peccancy.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -23,6 +21,7 @@ import com.pipudding.peccancy.service.WeixinService;
 import com.pipudding.peccancy.utils.CustomerInfoType;
 import com.pipudding.peccancy.utils.EvenInfoType;
 import com.pipudding.peccancy.utils.EventType;
+import com.pipudding.peccancy.utils.JsapiType;
 import com.pipudding.peccancy.utils.ResultType;
 
 @RestController
@@ -57,7 +56,7 @@ public class WeixinRestController {
 		return "123";
 	}*/
 	
-	@RequestMapping(value = "/imgupload", method = RequestMethod.POST)
+	@RequestMapping(value = "/weixin/imgupload", method = RequestMethod.POST)
 	public ResultType imageUpload(@RequestParam(value = "fileVal") MultipartFile file) throws IllegalStateException, IOException {	
 		ResultType ret = new ResultType();
 		ret.setResultCode("fail");
@@ -82,7 +81,7 @@ public class WeixinRestController {
 		return ret;
     }
 	
-	@RequestMapping(value = "/imgdelete", method = RequestMethod.POST)
+	@RequestMapping(value = "/weixin/imgdelete", method = RequestMethod.POST)
 	public ResultType imageDelete(@RequestParam(value = "ID") String fileName) throws IllegalStateException, IOException {
 		ResultType ret = new ResultType();
 		weixinService.deleteImage(imgPath,fileName);
@@ -91,10 +90,10 @@ public class WeixinRestController {
 		return ret;
     }
 	
-	@RequestMapping(value = "/postcustomerinfo", method = RequestMethod.POST)
-	public ResultType postCustomerInfo(@RequestBody CustomerInfoType customerInfo) throws IllegalStateException, IOException {
+	@RequestMapping(value = "/weixin/postcustomerinfo", method = RequestMethod.POST)
+	public ResultType postCustomerInfo(@RequestBody CustomerInfoType customerInfo,HttpServletRequest request) throws IllegalStateException, IOException {
 		ResultType ret = new ResultType();
-		String customerId = "hua";
+		String customerId = request.getSession(true).getAttribute("customerId").toString();
 		
 		weixinService.saveCustomInfo(customerId, customerInfo);
 		
@@ -103,14 +102,14 @@ public class WeixinRestController {
 		return ret;
     }
 	
-	@RequestMapping(value = "/getcustomerinfo", method = RequestMethod.POST)
+	@RequestMapping(value = "/weixin/getcustomerinfo", method = RequestMethod.POST)
 	public CustomerInfoType getCustomerInfo(@RequestParam(value = "customerId") String customerId) throws IllegalStateException, IOException {
 		CustomerInfoType customerInfo = weixinService.getCustomer(customerId);
 		
 		return customerInfo;
     }
 	
-	@RequestMapping(value = "/gettypes", method = RequestMethod.GET)
+	@RequestMapping(value = "/weixin/gettypes", method = RequestMethod.GET)
 	public EventType[] getTypes() throws IllegalStateException, IOException {
 		
 		List<EventType> eventTypes = weixinService.getEventTypes();
@@ -119,12 +118,12 @@ public class WeixinRestController {
 		return eventTypeArray;
     }
 	
-	@RequestMapping(value = "/posteventinfo", method = RequestMethod.POST)
-	public ResultType postEventInfo(@RequestBody EvenInfoType eventInfo) throws IllegalStateException, IOException {
+	@RequestMapping(value = "/weixin/posteventinfo", method = RequestMethod.POST)
+	public ResultType postEventInfo(@RequestBody EvenInfoType eventInfo,HttpServletRequest request) throws IllegalStateException, IOException {
 		ResultType ret = new ResultType();
 		ret.setResultCode("fail");
-		String customerId = "hua";
-		String eventId = weixinService.createEvent(customerId,eventInfo.getType(),eventInfo.getText());
+		String customerId = request.getSession(true).getAttribute("customerId").toString();
+		String eventId = weixinService.createEvent(customerId,eventInfo);
 		if(eventId == "")
 		{
 			ret.setResultText("create event failed");
@@ -136,7 +135,11 @@ public class WeixinRestController {
 		ret.setResultCode("success");
 		ret.setResultText("");
 		return ret;
-			
+    }
+	
+	@RequestMapping(value = "/weixin/jsapi", method = RequestMethod.GET)
+	public JsapiType getJsapi(@RequestParam(value = "url") String url) {
+		return weixinService.getJsapi(url);
     }
 
 }

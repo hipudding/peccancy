@@ -63,6 +63,46 @@ public class TokenHelper {
 	    return curentToken;
 	}
 	
+	public static String getCustomerId(String code)
+	{
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxcab1dccd3a31b5eb&secret=536cf5ea9aa8c0117b1919eee28cefa7&code="+code+"&grant_type=authorization_code");
+		HttpResponse response = null;  
+		try{
+			response = httpClient.execute(httpGet);
+		}catch (Exception e) {} 
+		//TODO 添加统一log管理
+		String customerId = null;
+		try{
+			HttpEntity entity = response.getEntity();
+			String result=EntityUtils.toString(entity,"UTF-8");
+			JSONObject jsonResult = JSONObject.parseObject(result);
+			customerId = jsonResult.getString("openid");
+		}catch (Exception e) {} 
+    
+		return customerId;
+	}
+	
+	public static String getjsToken(String accessToken)
+	{
+		CloseableHttpClient httpClient = HttpClients.createDefault();
+		HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+accessToken+"&type=jsapi");
+		HttpResponse response = null;  
+		try{
+			response = httpClient.execute(httpGet);
+		}catch (Exception e) {} 
+		//TODO 添加统一log管理
+		String ticket = null;
+		try{
+			HttpEntity entity = response.getEntity();
+			String result=EntityUtils.toString(entity,"UTF-8");
+			JSONObject jsonResult = JSONObject.parseObject(result);
+			ticket = jsonResult.getString("ticket");
+		}catch (Exception e) {} 
+    
+		return ticket;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		getToken();
     }

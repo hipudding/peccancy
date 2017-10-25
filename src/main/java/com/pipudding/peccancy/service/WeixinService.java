@@ -6,7 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,17 +20,26 @@ import com.pipudding.peccancy.dao.EventTypeDao;
 import com.pipudding.peccancy.dao.FlowDao;
 import com.pipudding.peccancy.dao.FlowHistoryDao;
 import com.pipudding.peccancy.dao.ImageDao;
+import com.pipudding.peccancy.dao.UserDao;
 import com.pipudding.peccancy.entity.CustomerEntity;
 import com.pipudding.peccancy.entity.EventEntity;
 import com.pipudding.peccancy.entity.EventTypeEntity;
 import com.pipudding.peccancy.entity.FlowEntity;
 import com.pipudding.peccancy.entity.FlowHistoryEntity;
 import com.pipudding.peccancy.entity.ImageEntity;
+import com.pipudding.peccancy.entity.UserEntity;
 import com.pipudding.peccancy.utils.CustomerInfoType;
+import com.pipudding.peccancy.utils.EvenInfoType;
 import com.pipudding.peccancy.utils.EventListType;
+import com.pipudding.peccancy.utils.EventResultType;
 import com.pipudding.peccancy.utils.EventShowType;
 import com.pipudding.peccancy.utils.EventType;
 import com.pipudding.peccancy.utils.FlowHistoryType;
+import com.pipudding.peccancy.utils.JsapiType;
+import com.pipudding.peccancy.utils.TokenHelper;
+import com.pipudding.peccancy.utils.UserInfoType;
+import com.pipudding.peccancy.utils.UserLoginInfoType;
+import com.pipudding.peccancy.utils.utils;
 
 @Service
 @Transactional
@@ -51,6 +62,9 @@ public class WeixinService {
 	
 	@Autowired
 	FlowDao flowDao;
+	
+	@Autowired
+	UserDao userDao;
 	
 	public boolean saveFile(MultipartFile file,String imgPath,String fileName)
 	{		
@@ -167,7 +181,7 @@ public class WeixinService {
 		return eventTypes;
 	}
 	
-	public String createEvent(String customerId,String eventType,String information)
+	public String createEvent(String customerId,EvenInfoType eventInfo)
 	{
 		String eventId = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
 		
@@ -177,14 +191,16 @@ public class WeixinService {
 			return "";
 		
 		EventEntity event = new EventEntity();
-		event.setDescription(information);
+		event.setDescription(eventInfo.getText());
 		event.setEventId(eventId);
-		event.setEventType(eventType);
+		event.setEventType(eventInfo.getType());
 		event.setFlowGroup(currentFlows.get(0).getFlowGroup());
 		event.setFlowNo(0);
 		event.setCommitor(customerId);
 		event.setStars(0);
 		event.setFinish(0);
+		event.setLongitude(eventInfo.getLongitude());
+		event.setLatitude(eventInfo.getLatitude());
 		eventDao.save(event);
 		
 		for(FlowEntity flow:currentFlows)
@@ -194,6 +210,8 @@ public class WeixinService {
 			flowHistory.setFlow_no(flow.getFlowNo());
 			flowHistoryDao.save(flowHistory);
 		}
+		
+		event.setFlowCount(currentFlows.size());
 		
 		return eventId;
 	}
@@ -227,6 +245,25 @@ public class WeixinService {
 		return events;
 	}
 	
+	public List<EventListType> getEventList()
+	{
+		//TODO 要分页
+		String hql = "FROM event ORDER BY event_id DESC";
+		List<EventEntity> eventEntitys = eventDao.findByHQL(hql);
+		List<EventListType> events = new ArrayList<EventListType>();
+		for(EventEntity eventEntity:eventEntitys)
+		{
+			EventListType event = new EventListType();
+			event.setEventId(eventEntity.getEventId());
+			event.setEventType(eventEntity.getEventType());
+			event.setIcon(eventEntity.getFinish() == 0?"waiting":"success");
+			event.setText(eventEntity.getResult());
+			event.setCommitor(eventEntity.getCommitor());
+			events.add(event);
+		}
+		return events;
+	}
+	
 	public EventShowType getEvent(String eventId)
 	{
 		String hql = "FROM img WHERE event_id = ?0";
@@ -241,6 +278,9 @@ public class WeixinService {
 		eventShow.setText(event.getDescription());
 		eventShow.setResult(event.getResult()==null?"":event.getResult());
 		eventShow.setEventNo(event.getEventId());
+		eventShow.setLongitude(event.getLongitude());
+		eventShow.setLatitude(event.getLatitude());
+		eventShow.setFlowCount(event.getFlowCount());
 		
 		List<String> imagesShow = new ArrayList<String>();
 		for(ImageEntity image:images)
@@ -286,4 +326,135 @@ public class WeixinService {
 		
 		return eventShow;
 	}
+	
+	public void pushEventToNext(String userId,EventResultType eventResult)
+	{
+		EventEntity event = eventDao.findById(eventResult.getEventId());
+		if(event == null)
+			return;
+		
+		String hql = "FROM flow WHERE flow_group = ?0 and flow_no = ?1";
+		List<FlowEntity> flowList = flowDao.findByHQL(hql, event.getFlowGroup(),event.getFlowNo());
+		if(flowList == null)
+			return;
+		FlowEntity flow = flowList.get(0);
+		
+		hql = "FROM flow_history WHERE event_id = ?0 and flow_no = ?1";
+		List<FlowHistoryEntity> flowHistoryList = flowHistoryDao.findByHQL(hql, event.getEventId(),event.getFlowNo());
+		if(flowHistoryList == null)
+			return;
+		
+		FlowHistoryEntity flowHistory = flowHistoryList.get(0);
+		
+		if(flow.getRecordResult() == 1)
+			event.setResult(eventResult.getResult());
+		
+		flowHistory.setProcessor(userId);
+		
+		event.setFlowNo(event.getFlowNo() + 1);
+		//TODO 不能超过总流程,setfinish
+		
+		eventDao.saveOrUpdate(event);
+		flowHistoryDao.saveOrUpdate(flowHistory);
+	}
+	
+	public List<UserInfoType> getUser()
+	{
+		String hql = "FROM user";
+		List<UserEntity> userList = userDao.findByHQL(hql);
+		List<UserInfoType> userInfoList = new ArrayList<UserInfoType>();
+		if(userList == null)
+			return userInfoList;
+		
+		for(UserEntity user:userList)
+		{
+			UserInfoType userInfo = new UserInfoType();
+			userInfo.setUserId(user.getUserId());
+			userInfo.setUserEmail(user.getEmail());
+			userInfo.setUserName(user.getUserName());
+			userInfoList.add(userInfo);
+		}
+		return userInfoList;
+	}
+	
+	public List<String> getFlowInfo()
+	{
+		String hql = "FROM flow WHERE expired = ?0 ORDER BY flow_no";
+		List<FlowEntity> flowList = flowDao.findByHQL(hql,0);
+		List<String> flowInfoList = new ArrayList<String>();
+		if(flowList == null)
+			return flowInfoList;
+		
+		for(FlowEntity flow:flowList)
+		{
+			flowInfoList.add(flow.getFlowDesc());
+		}
+		return flowInfoList;
+	}
+	
+	public void addUser(UserInfoType userInfo)
+	{
+		//TODO 重名用户
+		UserEntity user = new UserEntity();
+		user.setUserId(UUID.randomUUID().toString());
+		user.setUserName(userInfo.getUserName());
+		user.setEmail(userInfo.getUserEmail());
+		user.setPassword("");
+		userDao.save(user);
+	}
+	
+	public void resetUserPassword(String userId)
+	{
+		UserEntity user = userDao.findById(userId);
+		if(user == null)
+			return;
+		
+		user.setPassword("");
+		userDao.saveOrUpdate(user);
+	}
+	
+	public boolean login(UserLoginInfoType loginType)
+	{
+		String hql = "FROM user WHERE user_name = ?0";
+		List<UserEntity> userList = userDao.findByHQL(hql, loginType.getUserName());
+		if(userList == null || userList.size() == 0)
+			return false;
+		
+		UserEntity user = userList.get(0);
+		String encript = "";
+		if(user.getPassword().length() == 0)
+		{
+			encript = DigestUtils.sha256Hex(loginType.getPassword());
+			user.setPassword(encript);
+			userDao.saveOrUpdate(user);
+			return true;
+		}
+		
+		encript = DigestUtils.sha256Hex(loginType.getPassword());
+		if(encript.equals(user.getPassword()))
+		{
+			return true;
+		}
+		else
+			return false;
+		
+	}
+	
+	public JsapiType getJsapi(String url)
+	{
+		String noncestr = utils.getnonceStr();
+		String timestamp = String.valueOf(System.currentTimeMillis()/1000); 
+		String access_token = TokenHelper.getToken();
+		String jsapi_ticket = TokenHelper.getjsToken(access_token);
+		
+		String signature = utils.getSignature(noncestr, jsapi_ticket, timestamp, url);
+		JsapiType api = new JsapiType();
+		api.setNoncestr(noncestr);
+		api.setTimestamp(timestamp);
+		api.setJsapi_ticket(signature);
+		api.setAppid("wxcab1dccd3a31b5eb");
+		
+		return api;
+	}
+	
 }

@@ -6,6 +6,10 @@ public class EventListType {
 	String eventId;
 	
 	String eventType;
+	
+	String commitor;
+	
+	String text;
 
 	public String getIcon() {
 		return icon;
@@ -29,6 +33,23 @@ public class EventListType {
 
 	public void setEventType(String eventType) {
 		this.eventType = eventType;
+	}
+
+
+	public String getCommitor() {
+		return commitor;
+	}
+
+	public void setCommitor(String commitor) {
+		this.commitor = commitor;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
 	}
 	
 	

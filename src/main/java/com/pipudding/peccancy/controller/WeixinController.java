@@ -2,6 +2,8 @@ package com.pipudding.peccancy.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,20 +23,20 @@ public class WeixinController {
 	@Autowired
 	WeixinService weixinService;
 	
-	@RequestMapping("/postevent")  
+	@RequestMapping(value = "/postevent",method=RequestMethod.GET)  
     public String postEvent() {  
 		weixinService.clearLastNotCommitImages("hua");
         return "event_info";  
     }
 	
-	@RequestMapping("/recordinfo")  
+	@RequestMapping(value = "/recordinfo",method=RequestMethod.GET)  
     public String recordInfo() {  
         return "personal_info";  
     }
 	
-	@RequestMapping("/getrecordinfo")  
-    public String getRecordInfo(Model model) {
-		String customerId = "hua";
+	@RequestMapping(value = "/getrecordinfo",method=RequestMethod.GET)  
+    public String getRecordInfo(Model model,HttpServletRequest request) {
+		String customerId = request.getSession(true).getAttribute("customerId").toString();
 		
 		CustomerInfoType customerInfo = weixinService.getCustomer(customerId);
 		
@@ -45,9 +47,9 @@ public class WeixinController {
         return "personal_info";  
     }
 	
-	@RequestMapping("/eventlist") 
-    public String eventList(Model model) {  
-		String customerId = "hua";
+	@RequestMapping(value = "/eventlist",method=RequestMethod.GET) 
+    public String eventList(Model model,HttpServletRequest request) {  
+		String customerId = request.getSession(true).getAttribute("customerId").toString();
 		List<EventListType> events = weixinService.getEventList(customerId);
 		model.addAttribute("eventList",events);
 		
