@@ -8,26 +8,20 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringApplication;
 
 import com.alibaba.fastjson.JSONObject;
 
 public class TokenHelper {
 	static Timestamp lastTokenTime = null;
+	static Timestamp lastApiTime = null;
 	static String token = null;
+	static String jsapi = null;
 	
-	@Value("${token_expire}")
-	static long validTime;
+	static long validTime = 7200;
 	
-	@Value("${token_url}")
-	static String url;
+	static final String appId = "wxcab1dccd3a31b5eb";
 	
-	@Value("${app_id}")
-	static String appId;
-	
-	@Value("${app_secret}")
-	static String appSecret;
+	static final String appSecret = "536cf5ea9aa8c0117b1919eee28cefa7";
 	
 	static public String getToken()
 	{
@@ -42,11 +36,24 @@ public class TokenHelper {
 		return token;
 	}
 	
+	static public String getApi(String access_token)
+	{
+		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		long apiLastTime = validTime;
+		if(lastApiTime != null)
+		{
+			apiLastTime = (currentTimestamp.getTime() - lastApiTime.getTime())/1000;
+		}
+		if(jsapi == null || apiLastTime >= validTime)
+			jsapi = getjsToken(access_token);
+		return jsapi;
+	}
+	
 	static private String requestToken()
 	{
 		CloseableHttpClient httpClient = HttpClients.createDefault();
 		//HttpGet httpGet = new HttpGet(url+"?grant_type=client_credential&appid="+appId+"&secret="+appSecret);
-		HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=wxcab1dccd3a31b5eb&secret=536cf5ea9aa8c0117b1919eee28cefa7");
+		HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+appId+"&secret="+appSecret);
 		HttpResponse response = null;  
 	    try{
 	        response = httpClient.execute(httpGet);
@@ -66,7 +73,7 @@ public class TokenHelper {
 	public static String getCustomerId(String code)
 	{
 		CloseableHttpClient httpClient = HttpClients.createDefault();
-		HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxcab1dccd3a31b5eb&secret=536cf5ea9aa8c0117b1919eee28cefa7&code="+code+"&grant_type=authorization_code");
+		HttpGet httpGet = new HttpGet("https://api.weixin.qq.com/sns/oauth2/access_token?appid="+appId+"&secret="+appSecret+"&code="+code+"&grant_type=authorization_code");
 		HttpResponse response = null;  
 		try{
 			response = httpClient.execute(httpGet);
@@ -102,8 +109,5 @@ public class TokenHelper {
     
 		return ticket;
 	}
-	
-	public static void main(String[] args) throws Exception {
-		getToken();
-    }
+
 }

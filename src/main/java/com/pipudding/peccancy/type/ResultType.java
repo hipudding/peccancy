@@ -1,4 +1,4 @@
-package com.pipudding.peccancy.utils;
+package com.pipudding.peccancy.type;
 
 public class ResultType {
 	private String resultCode;

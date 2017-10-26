@@ -1,4 +1,4 @@
-package com.pipudding.peccancy.utils;
+package com.pipudding.peccancy.interceotor;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;

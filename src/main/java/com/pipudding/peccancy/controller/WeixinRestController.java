@@ -1,13 +1,11 @@
 package com.pipudding.peccancy.controller;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.pipudding.peccancy.service.EventService;
+import com.pipudding.peccancy.service.UserService;
 import com.pipudding.peccancy.service.WeixinService;
-import com.pipudding.peccancy.utils.CustomerInfoType;
-import com.pipudding.peccancy.utils.EvenInfoType;
-import com.pipudding.peccancy.utils.EventType;
-import com.pipudding.peccancy.utils.JsapiType;
-import com.pipudding.peccancy.utils.ResultType;
+import com.pipudding.peccancy.type.CustomerInfoType;
+import com.pipudding.peccancy.type.EvenInfoType;
+import com.pipudding.peccancy.type.EventType;
+import com.pipudding.peccancy.type.JsapiType;
+import com.pipudding.peccancy.type.ResultType;
 
 @RestController
 public class WeixinRestController {
@@ -35,26 +35,22 @@ public class WeixinRestController {
 	@Autowired
 	WeixinService weixinService;
 	
+	@Autowired
+	EventService eventService;
+	
+	@Autowired
+	UserService userService;
+	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
     String weixinIndentity(String echostr,String timestamp,String nonce,String signature) {
 		//TODO 参数需要校验
-		String[] params = new String[] {myToken,timestamp,nonce};
-		Arrays.sort(params);
-		String rawString = String.join("", params);
-		String encryptString = DigestUtils.sha1Hex(rawString);
+		
+		String encryptString = weixinService.linkWeixin(myToken, timestamp, nonce);
+		
 		if(encryptString.equals(signature))
 			return echostr;
         return "";
     }
-	
-	/*@RequestMapping(value = "/", method = RequestMethod.POST)
-	String weixinMessage(HttpServletRequest request) throws IOException
-	{
-		InputStream inputStream = request.getInputStream();
-		Scanner s = new Scanner(inputStream).useDelimiter("\\A");
-		String result = s.hasNext() ? s.next() : "";
-		return "123";
-	}*/
 	
 	@RequestMapping(value = "/weixin/imgupload", method = RequestMethod.POST)
 	public ResultType imageUpload(@RequestParam(value = "fileVal") MultipartFile file) throws IllegalStateException, IOException {	
@@ -69,7 +65,7 @@ public class WeixinRestController {
 		String suffix = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
 		String fileName = UUID.randomUUID().toString() + suffix;
 		
-		if(weixinService.saveFile(file, imgPath,fileName) == false)
+		if(eventService.saveFile(file, imgPath,fileName) == false)
 		{
 			ret.setResultText("save file fail");
 			return ret;
@@ -84,7 +80,7 @@ public class WeixinRestController {
 	@RequestMapping(value = "/weixin/imgdelete", method = RequestMethod.POST)
 	public ResultType imageDelete(@RequestParam(value = "ID") String fileName) throws IllegalStateException, IOException {
 		ResultType ret = new ResultType();
-		weixinService.deleteImage(imgPath,fileName);
+		eventService.deleteImage(imgPath,fileName);
 		ret.setResultCode("success");
 		ret.setResultText("");
 		return ret;
@@ -95,7 +91,7 @@ public class WeixinRestController {
 		ResultType ret = new ResultType();
 		String customerId = request.getSession(true).getAttribute("customerId").toString();
 		
-		weixinService.saveCustomInfo(customerId, customerInfo);
+		userService.saveCustomInfo(customerId, customerInfo);
 		
 		ret.setResultCode("success");
 		ret.setResultText("");
@@ -104,7 +100,7 @@ public class WeixinRestController {
 	
 	@RequestMapping(value = "/weixin/getcustomerinfo", method = RequestMethod.POST)
 	public CustomerInfoType getCustomerInfo(@RequestParam(value = "customerId") String customerId) throws IllegalStateException, IOException {
-		CustomerInfoType customerInfo = weixinService.getCustomer(customerId);
+		CustomerInfoType customerInfo = userService.getCustomer(customerId);
 		
 		return customerInfo;
     }
@@ -112,7 +108,7 @@ public class WeixinRestController {
 	@RequestMapping(value = "/weixin/gettypes", method = RequestMethod.GET)
 	public EventType[] getTypes() throws IllegalStateException, IOException {
 		
-		List<EventType> eventTypes = weixinService.getEventTypes();
+		List<EventType> eventTypes = eventService.getEventTypes();
 		EventType[] eventTypeArray = new EventType[eventTypes.size()];
 		eventTypes.toArray(eventTypeArray);
 		return eventTypeArray;
@@ -123,14 +119,14 @@ public class WeixinRestController {
 		ResultType ret = new ResultType();
 		ret.setResultCode("fail");
 		String customerId = request.getSession(true).getAttribute("customerId").toString();
-		String eventId = weixinService.createEvent(customerId,eventInfo);
+		String eventId = eventService.createEvent(customerId,eventInfo);
 		if(eventId == "")
 		{
 			ret.setResultText("create event failed");
 			return ret;
 		}
 		
-		weixinService.setImageEventId(eventInfo.getImages(), eventId);
+		eventService.setImageEventId(eventInfo.getImages(), eventId);
 			
 		ret.setResultCode("success");
 		ret.setResultText("");

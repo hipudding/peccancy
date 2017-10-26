@@ -1,4 +1,4 @@
-package com.pipudding.peccancy.utils;
+package com.pipudding.peccancy.type;
 
 public class EventListType {
 	String icon;
@@ -8,6 +8,8 @@ public class EventListType {
 	String eventType;
 	
 	String commitor;
+	
+	String commitorName;
 	
 	String text;
 
@@ -50,6 +52,14 @@ public class EventListType {
 
 	public void setText(String text) {
 		this.text = text;
+	}
+
+	public String getCommitorName() {
+		return commitorName;
+	}
+
+	public void setCommitorName(String commitorName) {
+		this.commitorName = commitorName;
 	}
 	
 	

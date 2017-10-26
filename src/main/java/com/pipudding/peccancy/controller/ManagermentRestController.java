@@ -9,24 +9,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pipudding.peccancy.service.ConfigService;
+import com.pipudding.peccancy.service.EventService;
+import com.pipudding.peccancy.service.UserService;
 import com.pipudding.peccancy.service.WeixinService;
-import com.pipudding.peccancy.utils.EventResultType;
-import com.pipudding.peccancy.utils.EventTypeSubmit;
-import com.pipudding.peccancy.utils.ResultType;
-import com.pipudding.peccancy.utils.UserInfoType;
-import com.pipudding.peccancy.utils.UserLoginInfoType;
+import com.pipudding.peccancy.type.EventResultType;
+import com.pipudding.peccancy.type.EventTypeSubmit;
+import com.pipudding.peccancy.type.ResultType;
+import com.pipudding.peccancy.type.UserInfoType;
+import com.pipudding.peccancy.type.UserLoginInfoType;
 
 @RestController
 public class ManagermentRestController {
 	
 	@Autowired
-	WeixinService weixinService;
+	EventService eventService;
+	
+	@Autowired
+	UserService userService;
+	
+	@Autowired
+	ConfigService configService;
 	
 	@RequestMapping(value = "/manage/next", method = RequestMethod.POST)
     public ResultType eventToNextStage(@RequestBody EventResultType eventResult) {
 		ResultType ret = new ResultType();
 		String userId = "lujie";
-		weixinService.pushEventToNext(userId,eventResult);
+		eventService.pushEventToNext(userId,eventResult);
 		ret.setResultCode("success");
 		ret.setResultText("");
 		return ret;
@@ -36,7 +45,7 @@ public class ManagermentRestController {
     public ResultType createUser(@RequestBody UserInfoType userInfo) {
 		ResultType ret = new ResultType();
 		
-		weixinService.addUser(userInfo);
+		userService.addUser(userInfo);
 		
 		ret.setResultCode("success");
 		ret.setResultText("");
@@ -47,7 +56,7 @@ public class ManagermentRestController {
     public ResultType resetPassword(@PathVariable String userId) {
 		ResultType ret = new ResultType();
 		
-		weixinService.resetUserPassword(userId);
+		userService.resetUserPassword(userId);
 		
 		ret.setResultCode("success");
 		ret.setResultText("");
@@ -61,7 +70,7 @@ public class ManagermentRestController {
 		StringBuffer userId = new StringBuffer();
 		StringBuffer userName = new StringBuffer();
 		
-		if(weixinService.login(userLoginInfo,userId,userName) == false)
+		if(userService.login(userLoginInfo,userId,userName) == false)
 		{
 			return ret;
 		}
@@ -80,7 +89,7 @@ public class ManagermentRestController {
 		ret.setResultCode("fail");
 		ret.setResultText("");
 		
-		weixinService.updateFlowInfo(flowNames);
+		configService.updateFlowInfo(flowNames);
 
 		
 		ret.setResultCode("success");
@@ -95,7 +104,7 @@ public class ManagermentRestController {
 		ret.setResultCode("fail");
 		ret.setResultText("");
 		
-		weixinService.updateTypeInfo(types);
+		configService.updateTypeInfo(types);
 
 		ret.setResultCode("success");
 		ret.setResultText("");

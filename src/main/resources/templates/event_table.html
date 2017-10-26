@@ -47,7 +47,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">违规管理系统</a>
+                <a class="navbar-brand" href="index.html">举报管理后台</a>
             </div>
             <ul class="nav navbar-top-links navbar-right">
                 <li class="dropdown">
@@ -68,19 +68,16 @@
                 <div class="sidebar-nav navbar-collapse">
                     <ul class="nav" id="side-menu">
                         <li>
-                            <a href="event_table.html" class="active"><i class="fa fa-envelope-o fa-fw"></i>事件管理</a>
+                            <a href="/manage/event_table" class="active"><i class="fa fa-envelope-o fa-fw"></i>事件管理</a>
                         </li>
                         <li>
-                            <a href="event_detail.html"><i class="fa fa-dashboard fa-fw"></i>进度管理</a>
+                            <a href="/admin/user_table"><i class="fa fa-user fa-fw"></i>用户管理</a>
                         </li>
                         <li>
-                            <a href="user_table.html"><i class="fa fa-user fa-fw"></i>用户管理</a>
+                            <a href="/admin/type_management"><i class="fa fa-gear fa-fw"></i>类别管理</a>
                         </li>
                         <li>
-                            <a href="type_management.html"><i class="fa fa-gear fa-fw"></i>类别管理</a>
-                        </li>
-                        <li>
-                            <a href="flow_management.html"><i class="fa fa-arrow-right fa-fw"></i>流程管理</a>
+                            <a href="/admin/flow_management"><i class="fa fa-arrow-right fa-fw"></i>流程管理</a>
                         </li>
                     </ul>
                 </div>
@@ -121,7 +118,7 @@
                                             <td><a th:text = "${event.eventId}" th:href = "'/manage/event_detail/' + ${event.eventId}"></a></td>
                                             <td th:text = "${event.eventType}"></td>
                                             <td th:text = "${event.text}"></td>
-                                            <td th:text = "${event.commitor}"></td>
+                                            <td th:text = "${event.commitorName}"></td>
                                         </tr>
                                     </tbody>
                                 </table>

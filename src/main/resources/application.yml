@@ -1,7 +1,7 @@
 server:
   port: 8443
   ssl:
-    key-store: ${log_path}/keystore.p12
+    key-store: ${key_path}/keystore.p12
     key-store-password: hipudding
     keyStoreType: PKCS12
     keyAlias: tomcat
@@ -45,12 +45,8 @@ logging:
   file: ${log_path}/peccancy.log
   root: INFO
 
-token_expire: 7200
-token_url: https://api.weixin.qq.com/cgi-bin/token
+
 my_token: hipudding
-app_id: wxcab1dccd3a31b5eb
-app_secret: 536cf5ea9aa8c0117b1919eee28cefa7
 img_path: /Users/huafengchun/Pictures/test
 log_path: /Users/huafengchun/Pictures/test
-
-server_addr: www.hipudding.cn
+key_path: /Users/huafengchun/Pictures/test

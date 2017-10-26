@@ -1,4 +1,4 @@
-package com.pipudding.peccancy.utils;
+package com.pipudding.peccancy.interceotor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,8 +8,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 public class ManageInterceptor implements HandlerInterceptor{
-	
-	final String serverAddr = "https://pe.hipudding.cn";
 	
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -21,6 +19,8 @@ public class ManageInterceptor implements HandlerInterceptor{
 
 		if(userId == null)
 		{
+			String serverAddr = request.getRequestURL().toString();
+			serverAddr = serverAddr.substring(0,serverAddr.indexOf('/', 8));
 			response.sendRedirect(serverAddr+"/manage/login");
 			return false;
 		}

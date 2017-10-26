@@ -1,4 +1,4 @@
-package com.pipudding.peccancy.utils;
+package com.pipudding.peccancy.interceotor;
 
 import java.net.URLEncoder;
 
@@ -6,13 +6,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.pipudding.peccancy.utils.TokenHelper;
+
 public class WeixinInterceptor implements HandlerInterceptor{
-	
-	final String serverAddr = "https://pe.hipudding.cn";
 	
 	@Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -27,7 +28,7 @@ public class WeixinInterceptor implements HandlerInterceptor{
 		String code = request.getParameter("code");
 		if(customerId == null&&code == null)
 		{
-			String url = serverAddr + request.getRequestURI();
+			String url = request.getRequestURL().toString();
 			String encodeUrl = URLEncoder.encode(url, "UTF-8");
 			response.sendRedirect("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxcab1dccd3a31b5eb&redirect_uri="+encodeUrl+"&response_type=code&scope=snsapi_base&state=123#wechat_redirect");
 			return false;
@@ -39,7 +40,7 @@ public class WeixinInterceptor implements HandlerInterceptor{
 			return false;
 		
 		session.setAttribute("customerId", openid);
-		response.sendRedirect(serverAddr + request.getRequestURI());
+		response.sendRedirect(request.getRequestURL().toString());
 		return false;
 		
     }
