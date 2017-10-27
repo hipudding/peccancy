@@ -318,7 +318,7 @@ public class EventService {
 		flowHistory.setProcessor(userId);
 		
 		event.setFlowNo((event.getFlowNo() + 1) > event.getFlowCount()?event.getFlowCount():(event.getFlowNo()+1));
-		event.setFinish(event.getFlowNo() >= event.getFlowCount()?1:0);
+		event.setFinish(event.getFlowNo() >= (event.getFlowCount()-1)?1:0);
 		
 		eventDao.saveOrUpdate(event);
 		flowHistoryDao.saveOrUpdate(flowHistory);

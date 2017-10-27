@@ -1,5 +1,5 @@
 server:
-  port: 8443
+  port: 443
   ssl:
     key-store: ${key_path}/keystore.p12
     key-store-password: hipudding
@@ -47,6 +47,6 @@ logging:
 
 
 my_token: hipudding
-img_path: /Users/huafengchun/Pictures/test
-log_path: /Users/huafengchun/Pictures/test
-key_path: /Users/huafengchun/Pictures/test
+img_path: /var/peccancy/image
+log_path: /var/peccancy/log
+key_path: /var/peccancy/key
