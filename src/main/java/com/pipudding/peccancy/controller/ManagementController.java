@@ -2,6 +2,8 @@ package com.pipudding.peccancy.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,7 @@ import com.pipudding.peccancy.type.EventListType;
 import com.pipudding.peccancy.type.EventShowType;
 import com.pipudding.peccancy.type.EventType;
 import com.pipudding.peccancy.type.UserInfoType;
+
 
 @Controller
 public class ManagementController {
@@ -72,5 +75,11 @@ public class ManagementController {
         return "user_table";  
     }
 	
-	
+	@RequestMapping(value = "/manage/logout",method=RequestMethod.GET)  
+    public String logout(HttpServletRequest request) {
+		request.getSession(true).removeAttribute("userId");
+		request.getSession(true).removeAttribute("userName");
+        return "login";  
+    }
+		
 }
